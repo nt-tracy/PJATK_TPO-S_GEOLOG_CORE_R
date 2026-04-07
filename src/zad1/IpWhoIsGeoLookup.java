@@ -36,16 +36,13 @@ public class IpWhoIsGeoLookup implements GeoLookup {
   }
 
   public GeoInfo parseGeoInfo(String json) throws GeoLookupException {
-    // Sprawdzenie pola "success":true
     if (!json.contains("\"success\":true")) {
       throw new GeoLookupException("API returned success:false");
     }
 
     try {
       String countryCode = extractValue(json, "country_code");
-      String timezoneId = extractValue(json, "timezone\", \"id\" : \""); // Szukamy id wewnątrz obiektu timezone
-
-      // Jeśli standardowe szukanie zawiedzie, szukamy po prostu klucza "id"
+      String timezoneId = extractValue(json, "timezone\", \"id\" : \"");
       if (timezoneId == null) timezoneId = extractValue(json, "id");
 
       if (countryCode == null || timezoneId == null) {
@@ -59,11 +56,9 @@ public class IpWhoIsGeoLookup implements GeoLookup {
   }
 
   private String extractValue(String json, String key) {
-    // Szukamy fragmentu "klucz":"wartość"
     String pattern = "\"" + key + "\":\"";
     int start = json.indexOf(pattern);
     if (start == -1) {
-      // Próba obsłużenia formatu bez cudzysłowu po dwukropku (dla bezpieczeństwa)
       pattern = "\"" + key + "\": \"";
       start = json.indexOf(pattern);
     }

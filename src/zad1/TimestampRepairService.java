@@ -24,7 +24,6 @@ public class TimestampRepairService {
       LogEntry current = entries.get(i);
       LocalDateTime ldt = current.serverLocalTime();
 
-      // 1. Czas nieistniejący (Spring Forward)
       ZoneOffsetTransition transition = rules.getTransition(ldt);
       if (transition != null && transition.isGap()) {
         LocalDateTime repaired = ldt.plus(transition.getDuration());
@@ -32,7 +31,6 @@ public class TimestampRepairService {
         continue;
       }
 
-      // 2. Czas niejednoznaczny (Fall Back)
       if (rules.getValidOffsets(ldt).size() > 1) {
         List<LogEntry> block = new ArrayList<>();
         block.add(current);
@@ -48,7 +46,6 @@ public class TimestampRepairService {
         continue;
       }
 
-      // 3. Czas poprawny
       results.add(new ResolvedLogEntry(current, ldt.atZone(zoneId), ResolutionKind.OK));
     }
     return results;
@@ -56,7 +53,6 @@ public class TimestampRepairService {
 
   private void resolveAmbiguousBlock(List<LogEntry> block, ZoneId zone, List<ResolvedLogEntry> results) {
     int jumpIndex = -1;
-    // Szukamy punktu "cofnięcia się" czasu w logach
     for (int k = 1; k < block.size(); k++) {
       if (block.get(k).serverLocalTime().isBefore(block.get(k - 1).serverLocalTime())) {
         if (jumpIndex != -1) {
@@ -72,7 +68,6 @@ public class TimestampRepairService {
       return;
     }
 
-    // Przypisanie offsetów: przed skokiem letni (index 0), od skoku zimowy (index 1)
     for (int k = 0; k < block.size(); k++) {
       LogEntry e = block.get(k);
       var offsets = zone.getRules().getValidOffsets(e.serverLocalTime());

@@ -9,8 +9,7 @@ package zad1;
 
 public class Main {
   public static void main(String[] args) throws Exception {
-//    String fileName = System.getProperty("user.home") + "/GeoLogOptions.yaml";
-    String fileName = System.getProperty("user.home") + "/Users/trace/GeoLogOptions.yaml";
+    String fileName = System.getProperty("user.home") + "/GeoLogOptions.yaml";
     GeoTimeOptions options = new OptionsLoader().load(fileName);
 
     GeoLookup lookup = new IpWhoIsGeoLookup();

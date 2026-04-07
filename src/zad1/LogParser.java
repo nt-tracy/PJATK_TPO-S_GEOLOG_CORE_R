@@ -1,9 +1,3 @@
-/**
- *
- *  @author Tracewicz Natalia s33507
- *
- */
-
 package zad1;
 
 import java.time.LocalDateTime;
@@ -19,17 +13,18 @@ public class LogParser {
     if (p.length != 8) return Optional.empty();
 
     try {
-      // Walidacja pól tekstowych i formatu IP (uproszczona)
-      if (p[0].isEmpty() || p[3].isEmpty() || p[4].isEmpty() || !p[2].contains("."))
+      if (p[0].isBlank() || p[3].isBlank() || p[4].isBlank() || !p[2].contains("."))
         return Optional.empty();
 
+      LocalDateTime time = LocalDateTime.parse(p[1]);
+      int status = Integer.parseInt(p[5]);
+      int latency = Integer.parseInt(p[6]);
+      int bytes = Integer.parseInt(p[7]);
+
+      if (latency < 0 || bytes < 0) return Optional.empty();
+
       return Optional.of(new LogEntry(
-              p[0],
-              LocalDateTime.parse(p[1]),
-              p[2], p[3], p[4],
-              Integer.parseInt(p[5]),
-              Integer.parseInt(p[6]),
-              Integer.parseInt(p[7])
+              p[0], time, p[2], p[3], p[4], status, latency, bytes
       ));
     } catch (DateTimeParseException | NumberFormatException e) {
       return Optional.empty();
